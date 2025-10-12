@@ -58,7 +58,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 新增步骤 1: 获取当前日期并设置为环境变量
       - name: Set build date as environment variable
         run: |
           echo "BUILD_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
@@ -112,7 +111,6 @@ jobs:
             -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
             immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
             
-      # 新增步骤 2: 重命名固件文件
       - name: Rename firmware file
         run: |
           original_file=$(find ${{ github.workspace }}/bin/targets/x86/64 -type f -name "*squashfs-combined-efi.img.gz")
@@ -121,7 +119,8 @@ jobs:
             exit 1
           fi
           new_filename="immortalwrt-x86-64-efi-${{ env.BUILD_DATE }}.img.gz"
-          mv "$original_file" "${{ github.workspace }}/bin/targets/x86/64/${new_filename}"
+          # --- 这里是关键修改 ---
+          sudo mv "$original_file" "${{ github.workspace }}/bin/targets/x86/64/${new_filename}"
           echo "固件已重命名为: ${new_filename}"
           echo "FIRMWARE_PATH=${{ github.workspace }}/bin/targets/x86/64/${new_filename}" >> $GITHUB_ENV
 
@@ -142,14 +141,11 @@ jobs:
             echo -e "\n#### 不带docker" >> ${{ github.workspace }}/router-info.md
           fi
 
-      # 修改步骤 3: 更新上传操作
       - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
-          # 使用新的、带日期的标签名
           tag_name: ${{ env.RELEASE_TAG }}
           body_path: ${{ github.workspace }}/router-info.md
-          # 使用重命名后的确切文件路径
           files: ${{ env.FIRMWARE_PATH }}
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
