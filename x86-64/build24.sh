@@ -111,12 +111,12 @@ PACKAGES="$PACKAGES luci-i18n-openlist-zh-cn"
 # netdata监控面板
 PACKAGES="$PACKAGES luci-app-netdata"
 PACKAGES="$PACKAGES luci-i18n-netdata-zh-cn"
-# 自动获取和更新SSL证书
-PACKAGES="$PACKAGES luci-app-acme"
-PACKAGES="$PACKAGES luci-i18n-acme-zh-cn"
 # 管理用户访问控制列表
 PACKAGES="$PACKAGES luci-app-acl"
 PACKAGES="$PACKAGES luci-i18n-acl-zh-cn"
+# 自动获取和更新SSL证书
+PACKAGES="$PACKAGES luci-app-acme"
+PACKAGES="$PACKAGES luci-i18n-acme-zh-cn"
 # 用于配置和管理QoS（服务质量）
 PACKAGES="$PACKAGES luci-app-qos"
 PACKAGES="$PACKAGES luci-i18n-qos-zh-cn"
