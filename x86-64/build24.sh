@@ -122,7 +122,7 @@ PACKAGES="$PACKAGES luci-i18n-eqos-zh-cn"
 # 配置V2RayA代理工具
 PACKAGES="$PACKAGES luci-app-v2raya"
 PACKAGES="$PACKAGES luci-i18n-v2raya-zh-cn"
-# 配置Watchcat重启工具PACKAGES="$PACKAGES "
+# 配置Watchcat断网重启工具PACKAGES="$PACKAGES "
 PACKAGES="$PACKAGES luci-app-watchcat"
 PACKAGES="$PACKAGES luci-i18n-watchcat-zh-cn"
 # 用于在 OpenWrt 上配置和管理 NAT 映射功能，使内部网络的设备可以通过公共 IP 地址进行外部访问
