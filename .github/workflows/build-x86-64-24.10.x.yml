@@ -58,10 +58,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 【新增】获取当前日期并保存为环境变量 BUILD_DATE
-      - name: Get current date
-        id: date
-        run: echo "BUILD_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+      - name: Set build date as environment variable
+        run: |
+          echo "BUILD_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+          echo "RELEASE_TAG=ImmortalWrt-x86-64-$(date +'%Y-%m-%d-%H%M')" >> $GITHUB_ENV
 
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/x86-64/build24.sh
@@ -71,8 +71,7 @@ jobs:
           mkdir -p "${{ github.workspace }}/custom"
           echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
           echo "您设置的路由器管理地址是:${{ github.event.inputs.custom_router_ip }}"
-          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
-      
+
       - name: Validate PPPoE Inputs
         run: |
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
@@ -97,7 +96,6 @@ jobs:
           include_docker="${{ github.event.inputs.include_docker }}"
           luci_version="${{ github.event.inputs.luci_version }}"
           echo "Building for profile: $profile"
-          # 【修改】将 BUILD_DATE 环境变量传递给 Docker 容器，以便构建脚本可以使用它来命名固件
           docker run --rm -i \
             --user root \
             -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
@@ -111,33 +109,20 @@ jobs:
             -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
             -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
             -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-            -e BUILD_DATE=${{ env.BUILD_DATE }} \
             immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
-          
-
+            
       - name: Rename firmware file
         run: |
-          # 找到生成的固件文件
-          original_file=$(find ${{ github.workspace }}/bin/targets/x86/64 -maxdepth 1 -type f -name '*squashfs-combined-efi.img.gz' -print -quit)
-          
-          # 检查文件是否找到
+          original_file=$(find ${{ github.workspace }}/bin/targets/x86/64 -type f -name "*squashfs-combined-efi.img.gz")
           if [ -z "$original_file" ]; then
-            echo "Error: Firmware file not found."
+            echo "错误：找不到固件文件！"
             exit 1
           fi
-          
-          # 构建新的文件名：例如 openwrt-x86-64-generic-squashfs-combined-efi-20251012.img.gz
-          new_file_name=$(basename "$original_file" | sed "s/\.img\.gz/g.img.gz")
-          new_file_name=${new_file_name%g.img.gz}-'${{ env.BUILD_DATE }}'.img.gz
-          
-          # 重命名文件
-          mv "$original_file" "$(dirname "$original_file")/$new_file_name"
-          echo "Firmware renamed to $new_file_name"
-          # 将新的文件名保存到环境变量，供上传步骤使用
-          echo "FIRMWARE_FILE=$new_file_name" >> $GITHUB_ENV
-          
-          # 由于原脚本的上传步骤使用了通配符，我们为了保险也可以不重命名，而是让构建脚本在容器内直接命名。
-          # 但是因为我不能修改你的 build24.sh，所以现在我先在容器外进行重命名。
+          new_filename="immortalwrt-x86-64-efi-squashfs-combined-efi-${{ env.BUILD_DATE }}.img.gz"
+          # --- 这里是关键修改 ---
+          sudo mv "$original_file" "${{ github.workspace }}/bin/targets/x86/64/${new_filename}"
+          echo "固件已重命名为: ${new_filename}"
+          echo "FIRMWARE_PATH=${{ github.workspace }}/bin/targets/x86/64/${new_filename}" >> $GITHUB_ENV
 
       - name: Create info
         run: |
@@ -159,10 +144,9 @@ jobs:
       - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
-          tag_name: Autobuild-x86-64-${{ env.BUILD_DATE }} # 【修改】将 tag_name 也加上日期
+          tag_name: ${{ env.RELEASE_TAG }}
           body_path: ${{ github.workspace }}/router-info.md
-          files: |
-            ${{ github.workspace }}/bin/targets/x86/64/${{ env.FIRMWARE_FILE }} # 【修改】使用精确的文件名上传
+          files: ${{ env.FIRMWARE_PATH }}
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
