@@ -63,6 +63,76 @@ PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
 # 静态文件服务器dufs(推荐)
 PACKAGES="$PACKAGES luci-i18n-dufs-zh-cn"
+#
+PACKAGES="$PACKAGES luci-proto-wireguard"
+PACKAGES="$PACKAGES luci-app-smartdns"
+PACKAGES="$PACKAGES luci-i18n-smartdns-zh-cn"
+# 防IP地址伪造攻击 
+PACKAGES="$PACKAGES luci-app-banip"
+PACKAGES="$PACKAGES luci-i18n-banip-zh-cn"
+PACKAGES="$PACKAGES luci-app-bcp38"
+PACKAGES="$PACKAGES luci-i18n-bcp38-zh-cn"
+PACKAGES="$PACKAGES luci-app-fwknopd"
+PACKAGES="$PACKAGES luci-i18n-fwknopd-zh-cn"
+# 内存清理工具（释放空闲内存）
+PACKAGES="$PACKAGES luci-app-ramfree"
+PACKAGES="$PACKAGES luci-i18n-ramfree-zh-cn"
+# 基于 DNS 的广告过滤工具）
+PACKAGES="$PACKAGES luci-app-adblock"
+PACKAGES="$PACKAGES luci-i18n-adblock-zh-cn"
+# zerotier内网穿透工具
+PACKAGES="$PACKAGES luci-i18n-zerotier-zh-cn"
+# NPS 内网穿透服务器
+PACKAGES="$PACKAGES luci-app-nps"
+PACKAGES="$PACKAGES luci-i18n-nps-zh-cn"
+# 动态 DNS 服务配置（支持多种提供商）
+PACKAGES="$PACKAGES luci-app-ddns"
+PACKAGES="$PACKAGES luci-i18n-ddns-zh-cn"
+PACKAGES="$PACKAGES luci-app-ddns-go"
+PACKAGES="$PACKAGES luci-i18n-ddns-go-zh-cn"
+# Frp 内网穿透客户端
+PACKAGES="$PACKAGES luci-app-frpc"
+PACKAGES="$PACKAGES luci-i18n-frpc-zh-cn"
+# Frp 内网穿透服务端
+PACKAGES="$PACKAGES luci-app-frps"
+PACKAGES="$PACKAGES luci-i18n-frps-zh-cn"
+# Ngrok 内网穿透客户端
+PACKAGES="$PACKAGES luci-app-ngrokc"
+PACKAGES="$PACKAGES luci-i18n-ngrokc-zh-cn"
+# Aria2 多协议下载工具（支持 HTTP/BT/磁力链接）
+PACKAGES="$PACKAGES luci-app-aria2"
+PACKAGES="$PACKAGES luci-i18n-aria2-zh-cn"
+# 解锁网易云音乐灰色歌曲
+PACKAGES="$PACKAGES luci-app-unblockneteasemusic"
+# openlist
+PACKAGES="$PACKAGES luci-app-openlist"
+PACKAGES="$PACKAGES luci-i18n-openlist-zh-cn"
+# netdata监控面板
+PACKAGES="$PACKAGES luci-app-netdata"
+PACKAGES="$PACKAGES luci-i18n-netdata-zh-cn"
+# 自动获取和更新SSL证书
+PACKAGES="$PACKAGES luci-app-acme"
+PACKAGES="$PACKAGES luci-i18n-acme-zh-cn"
+# 用于配置和管理QoS（服务质量）
+PACKAGES="$PACKAGES luci-app-qos"
+PACKAGES="$PACKAGES luci-i18n-qos-zh-cn"
+PACKAGES="$PACKAGES luci-app-eqos"
+PACKAGES="$PACKAGES luci-i18n-eqos-zh-cn"
+# 配置V2RayA代理工具
+PACKAGES="$PACKAGES luci-app-v2raya"
+PACKAGES="$PACKAGES luci-i18n-v2raya-zh-cn"
+# 配置Watchcat重启工具PACKAGES="$PACKAGES "
+PACKAGES="$PACKAGES luci-app-watchcat"
+PACKAGES="$PACKAGES luci-i18n-watchcat-zh-cn"
+# 用于在 OpenWrt 上配置和管理 NAT 映射功能，使内部网络的设备可以通过公共 IP 地址进行外部访问
+PACKAGES="$PACKAGES luci-app-natmap"
+PACKAGES="$PACKAGES luci-i18n-natmap-zh-cn"
+# USB 打印机共享服务
+PACKAGES="$PACKAGES luci-app-usb-printer"
+PACKAGES="$PACKAGES luci-i18n-usb-printer-zh-cn"
+# 网络打印服务器（支持 RAW 打印）
+PACKAGES="$PACKAGES luci-app-p910nd"
+PACKAGES="$PACKAGES luci-i18n-p910nd-zh-cn"
 # ======== shell/custom-packages.sh =======
 # 合并imm仓库以外的第三方插件
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
