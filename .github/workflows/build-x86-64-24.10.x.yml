@@ -58,6 +58,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 新增步骤 1: 获取当前日期并设置为环境变量
+      - name: Set build date as environment variable
+        run: |
+          echo "BUILD_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+          echo "RELEASE_TAG=ImmortalWrt-x86-64-$(date +'%Y-%m-%d-%H%M')" >> $GITHUB_ENV
+
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/x86-64/build24.sh
 
@@ -66,8 +72,7 @@ jobs:
           mkdir -p "${{ github.workspace }}/custom"
           echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
           echo "您设置的路由器管理地址是:${{ github.event.inputs.custom_router_ip }}"
-          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
-      
+
       - name: Validate PPPoE Inputs
         run: |
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
@@ -105,8 +110,20 @@ jobs:
             -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
             -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
             -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-          immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
-          
+            immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
+            
+      # 新增步骤 2: 重命名固件文件
+      - name: Rename firmware file
+        run: |
+          original_file=$(find ${{ github.workspace }}/bin/targets/x86/64 -type f -name "*squashfs-combined-efi.img.gz")
+          if [ -z "$original_file" ]; then
+            echo "错误：找不到固件文件！"
+            exit 1
+          fi
+          new_filename="immortalwrt-x86-64-efi-${{ env.BUILD_DATE }}.img.gz"
+          mv "$original_file" "${{ github.workspace }}/bin/targets/x86/64/${new_filename}"
+          echo "固件已重命名为: ${new_filename}"
+          echo "FIRMWARE_PATH=${{ github.workspace }}/bin/targets/x86/64/${new_filename}" >> $GITHUB_ENV
 
       - name: Create info
         run: |
@@ -125,13 +142,15 @@ jobs:
             echo -e "\n#### 不带docker" >> ${{ github.workspace }}/router-info.md
           fi
 
+      # 修改步骤 3: 更新上传操作
       - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
-          tag_name: Autobuild-x86-64
+          # 使用新的、带日期的标签名
+          tag_name: ${{ env.RELEASE_TAG }}
           body_path: ${{ github.workspace }}/router-info.md
-          files: |
-            ${{ github.workspace }}/bin/targets/x86/64/*squashfs-combined-efi.img.gz
+          # 使用重命名后的确切文件路径
+          files: ${{ env.FIRMWARE_PATH }}
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
